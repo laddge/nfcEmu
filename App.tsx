@@ -3,11 +3,31 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, useColorScheme } from 'react-native';
 import { useMaterial3Theme } from '@pchmn/expo-material3-theme';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider, Appbar, Button, TextInput, RadioButton } from 'react-native-paper';
+import { HCESession, NFCTagType4NDEFContentType, NFCTagType4 } from 'react-native-hce';
 
 export default function App() {
   const [text, setText] = useState('');
   const [mode, setMode] = useState('Text');
   const [running, setRunning] = useState(0);
+
+  let session: HCESession;
+  const toggleSession = async () => {
+    if (running) {
+      setRunning(0);
+      await session.setEnabled(false);
+    } else {
+      setRunning(1);
+      const tag = new NFCTagType4({
+        type: mode == 'Text' ? NFCTagType4NDEFContentType.Text : NFCTagType4NDEFContentType.URL,
+        content: text,
+        writable: false
+      });
+
+      session = await HCESession.getInstance();
+      session.setApplication(tag);
+      await session.setEnabled(true);
+    }
+  }
 
   const colorScheme = useColorScheme();
   const { theme } = useMaterial3Theme();
@@ -54,7 +74,7 @@ export default function App() {
           style={styles.button}
           mode="contained"
           icon={['play', 'pause'][running]}
-          onPress={() => setRunning((running + 1) % 2)}
+          onPress={() => toggleSession()}
           disabled={text.trim() == ''}
         >
           {['Start', 'Stop'][running]}
