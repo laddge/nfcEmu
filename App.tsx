@@ -42,7 +42,7 @@ export default function App() {
       <Appbar.Header>
         <Appbar.Content title="NFC Card Emu" />
       </Appbar.Header>
-      <View style={styles.container}>
+      <View style={{ ...styles.container, backgroundColor: paperTheme.colors.background }}>
         <RadioButton.Group onValueChange={mode => setMode(mode)} value={mode}>
           <View style={styles.row}>
             <View style={styles.row}>
